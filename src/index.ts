@@ -25,7 +25,7 @@ app.use(
     paymentMiddleware(
         PAY_TO,
         {
-            "/*": {
+            "/generate": {
                 // USDC amount in dollars
                 price: "$0.001",
                 network: NETWORK,
@@ -36,7 +36,7 @@ app.use(
 );
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
+app.get('/api/health', (req: Request, res: Response) => {
     res.status(200).json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
