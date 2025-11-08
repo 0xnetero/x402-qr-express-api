@@ -1,13 +1,18 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import { paymentMiddleware, Resource } from "x402-express";
+import { config } from "dotenv";
+import { paymentMiddleware } from "x402-express";
+import { createFacilitatorConfig } from "@coinbase/x402";
 import qrcodeRoutes from './routes/qrcode';
+
+config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const PAY_TO = "0x0c3ECFe71297d5FB873a9e4C5B9d0DFc8D2d9768";
 const NETWORK = "base";
-const FACILITATOR_URL = "https://x402.org/facilitator" as Resource;
+
+const facilitator = createFacilitatorConfig(process.env.CDP_API_KEY_ID, process.env.CDP_API_KEY_SECRET);
 
 // Body parser middleware
 app.use(express.json());
@@ -26,9 +31,7 @@ app.use(
                 network: NETWORK,
             },
         },
-        {
-            url: FACILITATOR_URL,
-        },
+        facilitator
     ),
 );
 
