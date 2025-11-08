@@ -25,7 +25,7 @@ app.use(
     paymentMiddleware(
         PAY_TO,
         {
-            "/api/qr-code/*": {
+            "/*": {
                 // USDC amount in dollars
                 price: "$0.001",
                 network: NETWORK,
@@ -36,7 +36,7 @@ app.use(
 );
 
 // Health check endpoint
-app.get('/api/health', (req: Request, res: Response) => {
+app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
@@ -45,7 +45,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // QR code routes
-app.use('/api/qr-code', qrcodeRoutes);
+app.use('/', qrcodeRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
