@@ -6,7 +6,7 @@ import qrcodeRoutes from './routes/qrcode';
 const app = express();
 const PORT = process.env.PORT || 5000;
 const PAY_TO = "0x0c3ECFe71297d5FB873a9e4C5B9d0DFc8D2d9768";
-const NETWORK = "base-sepolia";
+const NETWORK = "base";
 const FACILITATOR_URL = "https://x402.org/facilitator" as Resource;
 
 // Body parser middleware
@@ -63,6 +63,5 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 QR Code Generator API running on http://localhost:${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🚀 QR Code Generator API running on port ${PORT}`);
 });
