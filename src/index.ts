@@ -1,29 +1,36 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import { paymentMiddleware, Resource } from "x402-express";
 import qrcodeRoutes from './routes/qrcode';
-import { handlePreflight, addCorsHeaders } from './middleware/cors';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const PAY_TO = "0x0c3ECFe71297d5FB873a9e4C5B9d0DFc8D2d9768";
+const NETWORK = "base-sepolia";
+const FACILITATOR_URL = "https://x402.org/facilitator" as Resource;
 
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
+app.use(cors());
+
 app.use(
-    cors({
-        origin: ['http://localhost:5173', 'http://localhost:3000'],
-        methods: ['GET', 'POST', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization'],
-    })
+    paymentMiddleware(
+        PAY_TO,
+        {
+            "/api/qr-code/*": {
+                // USDC amount in dollars
+                price: "$0.001",
+                network: NETWORK,
+            },
+        },
+        {
+            url: FACILITATOR_URL,
+        },
+    ),
 );
-
-// Custom CORS middleware
-app.use(addCorsHeaders);
-
-// Handle preflight requests FIRST (before authentication)
-app.use(handlePreflight);
 
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
@@ -38,7 +45,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use('/api/qr-code', qrcodeRoutes);
 
 // 404 handler
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
     res.status(404).json({
         error: 'Not found',
         message: 'The requested endpoint does not exist',
@@ -46,7 +53,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     console.error('Error:', err);
     res.status(500).json({
         error: 'Internal server error',
